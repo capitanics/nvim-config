@@ -9,6 +9,9 @@ return {
                 c = { "clang-format" },
                 python = { "isort", "black" },
                 lua = { "luaformatter" },
+                json = { "prettier" },
+                html = { "prettier" },
+                markdown = { "prettier" }
             },
             format_on_save = {
                 lsp_fallback = true,
