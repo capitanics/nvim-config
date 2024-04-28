@@ -95,7 +95,6 @@ vim.opt.tabstop = 4
 vim.opt.softtabstop = 4
 vim.opt.shiftwidth = 4
 
-Auto_save = true
 -- Set to true if you have a Nerd Font installed
 vim.g.have_nerd_font = true
 
@@ -723,6 +722,9 @@ require('lazy').setup({
         },
         sources = {
           { name = 'nvim_lsp' },
+          -- { name = 'copilot', group_index = 2 },
+          { name = 'luasnip' },
+          { name = 'path' },
           { name = 'luasnip' },
           { name = 'path' },
         },
