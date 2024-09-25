@@ -1,5 +1,2 @@
-return {
-    "folke/tokyonight.nvim",
-    lazy = false,
-    opts = { style = "moon" },
-}
+return { "diegoulloao/neofusion.nvim", priority = 1000, config = true, opts = ... }
+

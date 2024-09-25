@@ -10,8 +10,11 @@ return {
                 python = { "isort", "black" },
                 lua = { "luaformatter" },
                 json = { "prettier" },
+                javascript = { "prettier" },
                 html = { "prettier" },
                 markdown = { "prettier" },
+                java = { "google-java-format" },
+                xml = { "xmlformatter" },
                 bash = { "shfmt" },
                 cmake = { "cmakelang" }
             },
