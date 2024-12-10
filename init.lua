@@ -94,7 +94,7 @@ vim.g.maplocalleader = ' '
 vim.opt.tabstop = 4
 vim.opt.softtabstop = 4
 vim.opt.shiftwidth = 4
-
+vim.opt.expandtab = true
 -- Set to true if you have a Nerd Font installed
 vim.g.have_nerd_font = true
 
@@ -234,7 +234,7 @@ vim.opt.rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-  'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
+  -- 'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -246,7 +246,7 @@ require('lazy').setup({
   --    require('Comment').setup({})
 
   -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim',    opts = {} },
+  { 'numToStr/Comment.nvim', opts = {} },
   {
     'rust-lang/rust.vim',
     ft = "rust",
@@ -331,7 +331,7 @@ require('lazy').setup({
 
       -- Document existing key chains
       spec = {
-        { '<leader>c', group = '[C]ode', mode = { 'n', 'x' } },
+        { '<leader>c', group = '[C]ode',     mode = { 'n', 'x' } },
         { '<leader>d', group = '[D]ocument' },
         { '<leader>r', group = '[R]ename' },
         { '<leader>s', group = '[S]earch' },
@@ -355,6 +355,12 @@ require('lazy').setup({
     branch = '0.1.x',
     dependencies = {
       'nvim-lua/plenary.nvim',
+      {
+        "nvim-telescope/telescope-live-grep-args.nvim",
+        -- This will not install any breaking changes.
+        -- For major updates, this must be adjusted manually.
+        version = "^1.0.0",
+      },
       { -- If encountering errors, see telescope-fzf-native README for installation instructions
         'nvim-telescope/telescope-fzf-native.nvim',
 
@@ -408,13 +414,16 @@ require('lazy').setup({
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
-          },
+          }
         },
       }
 
       -- Enable Telescope extensions if they are installed
+      pcall(require('telescope').load_extension, 'live_grep_args')
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
+      pcall(require('telescope').load_extension, 'emoji')
+
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
@@ -424,6 +433,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+      vim.keymap.set("n", "<leader>fg", ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>")
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
@@ -467,7 +477,7 @@ require('lazy').setup({
       },
     },
   },
-  { 'Bilal2453/luvit-meta', lazy = true },
+  { 'Bilal2453/luvit-meta',  lazy = true },
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
@@ -479,7 +489,7 @@ require('lazy').setup({
 
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim', opts = {} },
+      { 'j-hui/fidget.nvim',       opts = {} },
 
       -- Allows extra capabilities provided by nvim-cmp
       'hrsh7th/cmp-nvim-lsp',
@@ -846,8 +856,9 @@ require('lazy').setup({
             group_index = 0,
           },
           { name = 'nvim_lsp' },
-          -- { name = 'copilot', group_index = 2 },
+          { name = 'copilot', group_index = 2 },
           { name = 'luasnip' },
+          { name = 'emoji' },
           { name = 'path' },
           { name = 'luasnip' },
           { name = 'path' },
@@ -923,7 +934,7 @@ require('lazy').setup({
 
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup {
-        ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'vim', 'vimdoc' },
+        ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'vim', 'vimdoc', },
         -- Autoinstall languages that are not installed
         auto_install = true,
         highlight = { enable = true },
@@ -980,5 +991,30 @@ require('lazy').setup({
   },
 })
 
+vim.filetype.add({
+  extension = {
+    c3 = "c3",
+    c3i = "c3",
+    c3t = "c3",
+  },
+})
+
+local lspconfig = require('lspconfig')
+local util = require('lspconfig/util')
+local configs = require('lspconfig.configs')
+if not configs.c3_lsp then
+  configs.c3_lsp = {
+    default_config = {
+      cmd = { "/home/capitani/dev/c3-lsp/server/bin/c3lsp" },
+      filetypes = { "c3", "c3i" },
+      root_dir = function(fname)
+        return util.find_git_ancestor(fname)
+      end,
+      settings = {},
+      name = "c3_lsp"
+    }
+  }
+end
+lspconfig.c3_lsp.setup {}
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
